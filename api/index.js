@@ -9,16 +9,30 @@ app.use(express.json());
 env.config();
 
 const port = process.env.PORT;
-mongoose.connect(process.env.CONNECTION_STRING)
-.then(() => {
-    console.log("Database is Connected");  
-}).catch((err) => {
-    console.log(err);
-})
+try {
+    mongoose.connect(process.env.CONNECTION_STRING)
+    console.log("Database is connected");
+} catch (error) {
+    console.log(error);   
+}
+
+
 
 
 app.use('/api/user', userRoute)
 app.use('/api/auth',auth)
+
+
+app.use((err,req,res,next) => {
+    const statusCode = err.statusCode || 500
+    const message =  err.message || "Internal server error"  
+  
+    res.status(statusCode).json({
+      success : false,
+      statusCode,
+      message,
+    })
+  })
 
 
 app.listen(port,() => {
