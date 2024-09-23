@@ -62,7 +62,7 @@ const Signup = () => {
 
 
   return (
-    <div className=' min-h-screen mt-20'>
+    <div className=' min-h-[76vh] mt-20'>
       <div className='flex flex-col md:flex-row md:items-center p-3 mx-auto max-w-3xl gap-5'>
         {/* Left Logo bar */}
         <div className='flex-1'>
