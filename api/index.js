@@ -16,12 +16,8 @@ try {
     console.log(error);   
 }
 
-
-
-
 app.use('/api/user', userRoute)
 app.use('/api/auth',auth)
-
 
 app.use((err,req,res,next) => {
     const statusCode = err.statusCode || 500
