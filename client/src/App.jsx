@@ -7,6 +7,7 @@ import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import Header from './components/Header'
 import Footer from './components/FooterC'
+import ProtectedRoute from './components/ProtectedRoute'
 
 
 
@@ -22,7 +23,9 @@ function App() {
          <Route path='/projects' element = {<Projects />} />
          <Route path='/signin' element = {<Signin />} />
          <Route path='/signup' element = {<Signup />} />
+         <Route element={<ProtectedRoute />}>
          <Route path='/dashboard' element = {<Dashboard />} />
+         </Route>
        </Routes>
        <Footer />
      </BrowserRouter>
