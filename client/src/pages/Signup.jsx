@@ -45,7 +45,7 @@ const Signup = () => {
        }
        setLoading(false);
        if(res.ok) {
-        navigate('/signup')
+        navigate('/signin')
        }
       
     } catch (error) {    

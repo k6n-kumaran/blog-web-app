@@ -1,11 +1,14 @@
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
 import React, { useState } from 'react'
 import { Link ,useNavigate} from 'react-router-dom'
+import {signInFailure,signInStart,signInSuccess} from '../app/slice/userSlice.js'
+import {useDispatch, useSelector} from 'react-redux'
 
 
 const Signin = () => {
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [formData,setFormData] = useState({
     username : "",
@@ -13,8 +16,10 @@ const Signin = () => {
     password : ""
   })
 
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(false)
+  // const [error, setError] = useState(null)
+  // const [loading, setLoading] = useState(false)
+
+  const {loading, error : errorMsg} = useSelector((state) => state.user)
 
   const handleChange =(e) => {
     const {name,value} = e.target;
@@ -30,10 +35,12 @@ const Signin = () => {
   const handleSubmit = async(e) => {
     e.preventDefault();
     if ( !formData.email || !formData.password) {
-      return setError("Please fill the required fields")
+      // return setError("Please fill the required fields")
+      return dispatch(signInFailure("Please fill the required fields"))
     }
     try {
-      setLoading(true)
+      // setLoading(true)
+      dispatch(signInStart())
       const res = await fetch('api/auth/signin', {
         method : "POST",
         headers : { 'Content-Type' : "application/json"},
@@ -41,17 +48,20 @@ const Signin = () => {
       })
       const data = await res.json();
        if (data.success === false) {
-        return setError(data.message)
+        // return setError(data.message)
+        dispatch(signInSuccess(data.message))
        }
-       setLoading(false);
+       
        if(res.ok) {
+        dispatch(signInSuccess(data))
         navigate('/')
        }
       
     } catch (error) {    
-      setError(error.message)
+      // setError(error.message)
+      dispatch(signInFailure(error.message))
     } finally {
-      setLoading(false); 
+      
       setFormData({
         username : "",
         email : "",
@@ -97,9 +107,9 @@ const Signin = () => {
           <Link to={'/signup'} className='text-blue-500'>Sign up</Link>
         </div>
            {
-            error && (
+            errorMsg && (
               <Alert className=' mt-5 ' color={'failure'}>
-                {error}
+                {errorMsg}
               </Alert>
             )
            }
