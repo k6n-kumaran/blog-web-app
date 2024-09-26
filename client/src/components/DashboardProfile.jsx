@@ -1,10 +1,11 @@
 import { Alert, Button, TextInput } from 'flowbite-react'
 import React, { useEffect, useRef, useState } from 'react'
-import {useSelector} from 'react-redux'
+import {useSelector, useDispatch} from 'react-redux'
 import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/storage'
 import {app} from '../firebase'
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import {updateFailure,updateStart,updateSuccess} from '../app/slice/userSlice.js'
 
 const DashboardProfile = () => {
 
@@ -14,7 +15,10 @@ const DashboardProfile = () => {
   const [imageURL,setImageURL] = useState(null)
   const [imageUploadProgress,setImageUploadProgress] = useState(null)
   const [error, setError] = useState(null)
+
+  const [formData,setFormData] = useState({})
   const fileChooseRef = useRef();
+  const dispatch = useDispatch();
 
 
   const handlePicChange = (e) => {
@@ -25,6 +29,40 @@ const DashboardProfile = () => {
       setImageURL(URL.createObjectURL(file))
     }
     
+  }
+
+  const handleChange = (e) => {
+    setFormData({...formData, [e.target.id] : e.target.value})
+    console.log(formData);
+    
+  }
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    if(Object.keys(formData).length ===0) {
+      return;
+    }
+
+    try {
+      dispatch(updateStart());
+      
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method : "PUT",
+        headers : {
+          "Content-Type" : "application/json"
+        },
+        body: JSON.stringify(formData)
+      })
+      const data = await res.json();
+
+      if(!res.ok) {
+        dispatch(updateFailure(data.message))
+      } else{
+        dispatch(updateSuccess(data))
+      }
+    } catch (error) {
+      dispatch(updateFailure(error.message))
+    }
   }
 
   const uploadImage =  async() => {
@@ -60,6 +98,7 @@ const DashboardProfile = () => {
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setImageURL(downloadURL)
+          setFormData({...formData , photo : downloadURL})
         })
       }
     )
@@ -75,7 +114,7 @@ const DashboardProfile = () => {
   return (
     <div className='   mx-auto p-3 w-full'>
       <h1 className=' my-7 text-center font-semibold text-3xl'>Profile</h1>
-      <form className='flex flex-col gap-2'>
+      <form onSubmit={handleSubmit} className='flex flex-col gap-2'>
         <input type="file" accept='image/*' onChange={handlePicChange} ref={fileChooseRef} hidden/>
         <div className=" relative w-32 h-32 self-center rounded-full overflow-hidden shadow-md cursor-pointer" onClick={()=> fileChooseRef.current.click()}>
          {imageUploadProgress && (
@@ -102,9 +141,9 @@ const DashboardProfile = () => {
             {error}
           </Alert>
          }
-        <TextInput type='text'   id='username' defaultValue={currentUser.username}/>
-        <TextInput type='email'  id='email' defaultValue={currentUser.email}/>
-        <TextInput type='password' placeholder='password'  id='password'/>
+        <TextInput type='text'   id='username' defaultValue={currentUser.username} onChange={handleChange}/>
+        <TextInput type='email'  id='email' defaultValue={currentUser.email} onChange={handleChange}/>
+        <TextInput type='password' placeholder='password'  id='password' onChange={handleChange}/>
         <Button type='submit' gradientDuoTone={'purpleToBlue'} outline>Update</Button>
       </form>
       <div className='text-red-500 flex justify-between mt-4'>
