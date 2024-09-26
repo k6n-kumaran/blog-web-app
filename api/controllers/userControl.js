@@ -43,3 +43,17 @@ export const updateUser = async (req,res,next)  => {
         next(error)
     }
 }
+
+
+export const deleteUser = async(req,res,next) => {
+    if(req.user.id !==  req.params.userId) {
+        return next(errorHandler(401,"Your not allowed to delete the another user account"))
+    }
+
+    try {
+        await User.findByIdAndDelete(req.params.userId)
+        res.status(200).json("Deleted")
+    } catch (error) {
+        next(error)
+    }
+}
