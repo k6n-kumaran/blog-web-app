@@ -8,6 +8,8 @@ import Dashboard from './pages/Dashboard'
 import Header from './components/Header'
 import Footer from './components/FooterC'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
+import CreatePost from './pages/CreatePost'
 
 
 
@@ -24,7 +26,10 @@ function App() {
          <Route path='/signin' element = {<Signin />} />
          <Route path='/signup' element = {<Signup />} />
          <Route element={<ProtectedRoute />}>
-         <Route path='/dashboard' element = {<Dashboard />} />
+             <Route path='/dashboard' element = {<Dashboard />} />
+         </Route>
+         <Route element={<AdminRoute />}>
+             <Route path='/create-post' element = {<CreatePost />} />
          </Route>
        </Routes>
        <Footer />
