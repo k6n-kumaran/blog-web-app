@@ -6,7 +6,7 @@ import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/st
 import {app} from '../firebase'
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import {updateFailure,updateStart,updateSuccess ,deleteUserFailure,deleteUserStart,deleteUserSuccess} from '../app/slice/userSlice.js'
+import {updateFailure,updateStart,updateSuccess ,deleteUserFailure,deleteUserStart,deleteUserSuccess,signoutSuccess} from '../app/slice/userSlice.js'
 
 const DashboardProfile = () => {
 
@@ -82,6 +82,23 @@ const DashboardProfile = () => {
       }
     } catch (error) {
       dispatch(deleteUserFailure(error.message))
+    }
+  }
+
+  const handleSignOut = async() => {
+    try {
+      const res = await fetch(`/api/user/signout`, {
+        method : "POST"
+      })
+      const data = await res.json();
+      if(!res.ok) {
+        console.log(data.message); 
+      } else{
+        dispatch(signoutSuccess())
+      }
+    } catch (error) {
+      console.log(error.message);
+      
     }
   }
 
@@ -168,7 +185,7 @@ const DashboardProfile = () => {
       </form>
       <div className='text-red-500 flex justify-between mt-4'>
         <span onClick={() =>  setShowModel(true)} className='cursor-pointer'>Delete Account</span>
-        <span className='cursor-pointer'>Sign out</span>
+        <span onClick={handleSignOut} className='cursor-pointer'>Sign out</span>
       </div>
       {error && (
         <Alert color={'failure'} className='mt-5' >
