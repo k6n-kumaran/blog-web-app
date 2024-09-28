@@ -10,6 +10,7 @@ import Footer from './components/FooterC'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
 import CreatePost from './pages/CreatePost'
+import UpdatePost from './pages/UpdatePost'
 
 
 
@@ -30,6 +31,7 @@ function App() {
          </Route>
          <Route element={<AdminRoute />}>
              <Route path='/create-post' element = {<CreatePost />} />
+             <Route path='/update/:postId' element = {<UpdatePost />} />
          </Route>
        </Routes>
        <Footer />

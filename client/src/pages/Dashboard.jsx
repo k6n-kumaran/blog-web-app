@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import DashboardSidebar from '../components/DashboardSidebar';
 import DashboardProfile from '../components/DashboardProfile';
+import Posts from '../components/Posts';
 
 const Dashboard = () => {
 
@@ -23,8 +24,10 @@ const Dashboard = () => {
         <DashboardSidebar />
       </div>
       {/* Profile */}
-      <div className='w-full max-w-lg mx-auto'>
+      {/* w-full max-w-lg mx-auto */}
+      <div className='w-full'>
         {tab === "profile" && <DashboardProfile />}
+        {tab === "posts" && <Posts />}
       </div>
     </div>
   )

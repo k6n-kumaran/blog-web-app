@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {Alert, Button, FileInput, Select, TextInput} from 'flowbite-react'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -6,19 +6,43 @@ import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/st
 import {app} from '../firebase'
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import {useNavigate} from 'react-router-dom'
+import {useNavigate,useParams} from 'react-router-dom'
+import {useSelector} from 'react-redux'
 
 
 
-const CreatePost = () => {
+const UpdatePost = () => {
 
+  const {currentUser} = useSelector((state) => state.user)
   const navigate = useNavigate();
+  const {postId} = useParams();
   const [file,setFile] = useState(null)
   const [imageUploadProgress,setImageUploadProgress] = useState(null);
   const [error,setError] = useState(null)
   const [formData,setFormData] = useState({})
   const [publishError,setPublishError] = useState(null)
 
+  useEffect(() => {
+    try {
+        const fetchPosts = async() => {
+            const res = await fetch(`/api/post/posts?postId=${postId}`)
+            const data = await res.json();
+            if(!res.ok) {
+                console.log(data.message);
+                setPublishError(data.message)
+                return
+            }
+            if(res.ok) {
+                setPublishError(null)
+                setFormData(data.posts[0])
+            }
+        }
+        fetchPosts()
+    } catch (error) {
+        console.log(error.message);
+        
+    }
+  },[])
 
   
   const handleImageUpload = async ( ) => {
@@ -56,12 +80,12 @@ const CreatePost = () => {
     }
   }
 
-  const handlePublish = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch('/api/post/create', {
-        method:"POST",
+      const res = await fetch(`/api/post/update/${formData._id}/${currentUser._id}`, {
+        method:"PUT",
         headers : {
           "Content-Type" : "application/json"
         },
@@ -90,13 +114,15 @@ const CreatePost = () => {
 
   return (
     <div  className='p-3 max-w-3xl mx-auto min-h-screen'>
-        <h1 className='text-center text-3xl my-7 font-semibold'>Create a post</h1>
-        <form  onSubmit={handlePublish} className='flex flex-col gap-4'>
+        <h1 className='text-center text-3xl my-7 font-semibold'>Update a post</h1>
+        <form  onSubmit={handleUpdate} className='flex flex-col gap-4'>
           <div className=' flex flex-col sm:flex-row justify-between gap-4'>
            <TextInput type='text' placeholder='Title' required id='title'
             className='flex-1' onChange={(e) => {setFormData({...formData, title : e.target.value})}}
-           />
-           <Select onChange={(e) => {setFormData({...formData, category : e.target.value})}}>
+           value={formData.title}/>
+           <Select 
+           onChange={(e) => {setFormData({...formData, category : e.target.value})}} 
+           value={formData.category}>
              <option value="uncategorized">Select a category</option>
              <option value="javascript">Javascript</option>
              <option value="reactjs">React.js</option>
@@ -138,11 +164,12 @@ const CreatePost = () => {
             <img src={formData.image} alt="image" className='w-full h-72 object-cover' />
           )}
            <ReactQuill theme="snow"  placeholder='Write something...' className='h-52 mb-12' 
-           onChange={(value) => setFormData({...formData, content: value})}  />
-           <Button type='submit' gradientDuoTone={'purpleToPink'}>Publish</Button>
+           onChange={(value) => setFormData({...formData, content: value})}
+           value={formData.content}  />
+           <Button type='submit' gradientDuoTone={'purpleToPink'}>Update</Button>
         </form>
     </div>
   )
 }
 
-export default CreatePost
+export default UpdatePost
