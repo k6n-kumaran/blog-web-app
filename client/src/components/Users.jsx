@@ -3,24 +3,26 @@ import {useDispatch,useSelector} from 'react-redux'
 import {Button, Modal, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow} from 'flowbite-react'
 import { Link } from 'react-router-dom'
 import { HiOutlineExclamationCircle } from 'react-icons/hi'
+import { FaCheck,FaTimes } from 'react-icons/fa'
 
-const Posts = () => {
+
+const Users = () => {
 
   const {currentUser} = useSelector((state) => state.user)
-  const [userPosts, setUserPosts] = useState([])
+  const [users, setUsers] = useState([])
   const [showMore , setShowMore] = useState(true)
   const [showModal , setShowModal] = useState(false)
-  const [postId , setPostId] = useState(null)
+  const [userId , setUserId] = useState(null)
 
 
 
-  const fetchPosts = async () => {
+  const fetchUsers = async () => {
     try {
-      const res =await fetch(`/api/post/posts?userId=${currentUser._id}`)
+      const res =await fetch(`/api/user/getusers`)
       const data = await res.json();
       if(res.ok) {
-        setUserPosts(data.posts)
-        if(data.posts.length < 9) {
+        setUsers(data.users)
+        if(data.users.length < 9) {
           setShowMore(false)
         }
       }
@@ -31,14 +33,14 @@ const Posts = () => {
   }
   useEffect(() => {
    if(currentUser.isAdmin) {
-    fetchPosts()
+    fetchUsers()
    }
   },[currentUser._id])
 
   const handleDelete = async() => {
     setShowModal(false) 
     try {
-      const res = await fetch(`/api/post/deletepost/${postId}/${currentUser._id}`, {
+      const res = await fetch(`/api/user/delete/${userId}`, {
         method : "DELETE",
       })
 
@@ -47,10 +49,10 @@ const Posts = () => {
       if(!res.ok) {
         console.log(data.message);
       } else{
-        setUserPosts((prev) => {
-          prev.filter((post) => post._id !== postId)
+        setUsers((prev) => {
+          prev.filter((user) => user._id !== userId)
         })
-        fetchPosts()
+        fetchUsers()
       }
     } catch (error) {
       console.log(error.message);
@@ -59,14 +61,14 @@ const Posts = () => {
   }
 
   const handleShowMore = async() => {
-    const startIndex = userPosts.length;
+    const startIndex = users.length;
     try {
-      const res = await fetch(`/api/post/posts?userId=${currentUser._id}&startIndex=${startIndex}`)
+      const res = await fetch(`/api/user/getusers?startIndex=${startIndex}`)
       const data = await  res.json();
 
       if(res.ok) {
-        setUserPosts((prev) => [...prev,...data.posts])
-        if(data.posts.length<9) {
+        setUsers((prev) => [...prev,...data.users])
+        if(data.users.length<9) {
           setShowMore(false)
         }
       }
@@ -76,56 +78,47 @@ const Posts = () => {
     }
   }
 
-  console.log(userPosts);
   
   return (
     <div className='table-auto overflow-x-scroll md:mx-auto p-3 scrollbar
      scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500'>
-      {currentUser.isAdmin  && userPosts?.length > 0 ? (
+      {currentUser.isAdmin  && users?.length > 0 ? (
         <div >
           <Table hoverable className='shadow-md  w-full'>
             <TableHead>
-              <TableHeadCell>Date Updated</TableHeadCell>
-              <TableHeadCell>Post Image</TableHeadCell>
-              <TableHeadCell>Post Title</TableHeadCell>
-              <TableHeadCell>Category</TableHeadCell>
+              <TableHeadCell>Date Created</TableHeadCell>
+              <TableHeadCell>User Image</TableHeadCell>
+              <TableHeadCell>Username</TableHeadCell>
+              <TableHeadCell>Email</TableHeadCell>
+              <TableHeadCell>Admin</TableHeadCell>
               <TableHeadCell>Delete</TableHeadCell>
-              <TableHeadCell>
-                <span>Edit</span>
-              </TableHeadCell>
             </TableHead>
 
-            {userPosts.map((post,index) => {
+            {users.map((user,index) => {
               return  <TableBody key={index}>
               <TableRow  >
                <TableCell>
-                {new Date(post.createdAt).toLocaleDateString()}
+                {new Date(user.createdAt).toLocaleDateString()}
                </TableCell>
                <TableCell>
-                 <Link to={`/post/${post.slug}`}>
-                   <img src={post.photo} alt={post.title} className='w-20 h-10 object-cover bg-gray-500' />
+                 <Link to={`/post/${user._id}`}>
+                   <img src={user.photo} alt={user.title} className='w-20 h-10 object-cover bg-gray-500' />
                  </Link>
                </TableCell>
                <TableCell className='text-gray-600 dark:text-white  font-medium'>
-                <Link to={`/post/${post.slug}`}>
-                  {post.title}
-                </Link>
-                
+                {user.username}
                </TableCell>
                <TableCell className='text-gray-600 dark:text-white  font-medium'>
-                {post.category}
+                {user.email}
+               </TableCell>
+               <TableCell className='text-gray-600 dark:text-white  font-medium'>
+                {user.isAdmin ? <FaCheck className='text-green-500'/> : <FaTimes className='text-red-500'/>}
                </TableCell>
                <TableCell>
                 <span onClick={() => {
                   setShowModal(true)
-                  setPostId(post._id)
+                  setUserId(user._id)
                 }} className='font-medium cursor-pointer text-red-600 hover:underline'>Delete</span>
-               </TableCell>
-               <TableCell>
-               <Link to={`/update/${post._id}`} className='text-teal-400'>
-                 <span>Edit</span>
-               </Link>
-                
                </TableCell>
               </TableRow>
             </TableBody>
@@ -140,7 +133,7 @@ const Posts = () => {
         </div>
       ) : (
         <div>
-          <p>There is no post</p>
+          <p>There is no user yet</p>
         </div>
       )}
 
@@ -165,4 +158,4 @@ const Posts = () => {
   )
 }
 
-export default Posts
+export default Users

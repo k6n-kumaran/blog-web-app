@@ -11,6 +11,8 @@ import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
 import CreatePost from './pages/CreatePost'
 import UpdatePost from './pages/UpdatePost'
+import PostPage from './pages/PostPage'
+import ScrollToTop from './components/ScrollToTop'
 
 
 
@@ -19,6 +21,7 @@ function App() {
   return (
    <>
      <BrowserRouter>
+     <ScrollToTop />
        <Header />
        <Routes>
          <Route path='/' element = {<Home />} />
@@ -33,6 +36,7 @@ function App() {
              <Route path='/create-post' element = {<CreatePost />} />
              <Route path='/update/:postId' element = {<UpdatePost />} />
          </Route>
+         <Route path='/post/:postSlug' element={<PostPage />}/>
        </Routes>
        <Footer />
      </BrowserRouter>

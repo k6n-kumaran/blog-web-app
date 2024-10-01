@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import DashboardSidebar from '../components/DashboardSidebar';
 import DashboardProfile from '../components/DashboardProfile';
 import Posts from '../components/Posts';
+import Users from '../components/Users';
 
 const Dashboard = () => {
 
@@ -28,6 +29,7 @@ const Dashboard = () => {
       <div className='w-full'>
         {tab === "profile" && <DashboardProfile />}
         {tab === "posts" && <Posts />}
+        {tab === "users" && <Users />}
       </div>
     </div>
   )

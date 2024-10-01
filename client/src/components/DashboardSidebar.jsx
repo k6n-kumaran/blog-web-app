@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {Sidebar, SidebarItem, SidebarItemGroup, SidebarItems} from 'flowbite-react'
-import {HiArrowSmRight, HiDocument, HiUser} from 'react-icons/hi'
+import {HiArrowSmRight, HiDocument, HiOutlineUserGroup, HiUser} from 'react-icons/hi'
 import { Link, useLocation ,useNavigate} from 'react-router-dom';
 import { useDispatch ,useSelector} from 'react-redux';
 import { signoutSuccess } from '../app/slice/userSlice';
@@ -51,10 +51,16 @@ const DashboardSidebar = () => {
           </SidebarItem>
 
           {currentUser.isAdmin && (
-            <SidebarItem active= {tab==="posts"} 
-          href="/dashboard?tab=posts" icon={HiDocument}  >
-          Posts
-          </SidebarItem>
+            <div>
+               <SidebarItem active= {tab==="posts"} 
+                href="/dashboard?tab=posts" icon={HiDocument}  >
+                Posts
+               </SidebarItem>
+               <SidebarItem active= {tab==="users"} 
+                href="/dashboard?tab=users" icon={HiOutlineUserGroup}  >
+                Users
+               </SidebarItem>
+           </div>
           )}
           
           <SidebarItem onClick={handleSignOut} icon={HiArrowSmRight}  className=' cursor-pointer'>
